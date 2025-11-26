@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calendario de Adviento</title>
+  <style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #1a1a1a;
+    margin: 0;
+    padding: 0; /* ← quitado para usar 100vh completo */
+    text-align: center;
+    color: #f5e642;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  h1 {
+    color: #b37bff;
+    font-size: 2rem;
+    margin-top: 15px;
+    margin-bottom: 5px;
+  }
+
+  p {
+    margin-top: 0;
+  }
+
+  /* ⬇️ CALENDARIO A PANTALLA COMPLETA (4 columnas x 3 filas) */
+  .calendar {
+    flex-grow: 1;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 22px;
+    padding: 20px;
+    height: 100%;
+    box-sizing: border-box;
+  }
+
+  /* ⬇️ CAJAS MÁS ANCHAS Y MENOS ALTAS AUTOMÁTICAMENTE */
+  .day {
+    background: #4a148c;
+    border-radius: 20px;
+    font-size: 120px;
+    cursor: pointer;
+    transition: transform 0.3s, background 0.3s;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+    color: #f5e642;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .day:hover {
+    transform: scale(1.06);
+    background: #6a1b9a;
+  }
+
+  /* ⬇️ AJUSTADO PARA QUE LA REVELACIÓN TAMBIÉN QUEPA SIN SCROLL */
+  .revealed {
+    background: #ffffff;
+    color: #000;
+    font-size: 30px;
+    padding: 10px;
+    line-height: 1.4;
+    border-radius: 20px;
+    overflow-wrap: break-word;
+    word-break: break-word;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    overflow-y: auto;
+  }
+
+  .revealed:hover {
+      color: #f5e642;
+  }
+
+  .revealed img {
+    max-width: 100%;
+    border-radius: 12px;
+    margin-top: 10px;
+  }
+
+  audio {
+    margin-top: 10px;
+    width: 100%;
+  }
+
+    /* === TABLET (pantallas medianas) — 3 columnas === */
+  @media (max-width: 900px) {
+    .calendar {
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(4, 1fr);
+    }
+  }
+
+    /* === MÓVIL (pantallas pequeñas) — 2 columnas === */
+  @media (max-width: 600px) {
+    .calendar {
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: repeat(6, 1fr);
+      gap: 12px;
+      padding: 12px;
+    }
+
+    .day {
+      font-size: 22px;
+    }
+  }
+
+  /* === ANIMACIÓN DEL CONTENIDO REVELADO === */
+  @keyframes revealPop {
+    0% {
+      transform: scale(0.5);
+      opacity: 0;
+    }
+    60% {
+      transform: scale(1.1);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+
+  .revealed {
+    animation: revealPop 0.5s ease forwards;
+  }
+
+  /* ICONO DÍA (se mostrará encima del número) */
+  .icon {
+    font-size: 40px;
+    margin-bottom: 10px;
+    display: block;
+  }
+
+  /* === MODAL BONITO === */
+
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    backdrop-filter: blur(6px);
+    background: rgba(0, 0, 0, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    padding: 20px;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .modal-content {
+    background: #ffffff;
+    color: #000000;
+    padding: 25px;
+    border-radius: 25px;
+    max-width: 500px;
+    width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+
+    /* Glow effect */
+    box-shadow: 0 0 20px #b37bffaa;
+
+    animation: zoomIn 0.35s ease;
+    text-align: center;
+  }
+
+  .modal-close {
+    margin-top: 20px;
+    padding: 12px 24px;
+    background: linear-gradient(45deg, #b37bff, #6a1b9a);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: bold;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  @keyframes zoomIn {
+    0%   { transform: scale(0.6); opacity: 0; }
+    70%  { transform: scale(1.05); opacity: 1; }
+    100% { transform: scale(1); }
+  }
+
+  /* Estilo base del audio */
+  audio {
+    width: 100%;
+    margin-top: 10px;
+    outline: none;
+    border-radius: 12px;
+    background: #6a1b9a;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    accent-color: #f5e642;;
+  }
+
+  /* Cambiar barra de reproducción en Chrome/Safari */
+  audio::-webkit-media-controls-panel {
+    background: #6a1b9a;
+    border-radius: 12px;
+  }
+
+  /* Cambiar barra de progreso */
+  audio::-webkit-media-controls-timeline {
+    background: #6a1b9a;
+    border-radius: 10px;
+    height: 8px;
+  }
+
+  /* Cambiar volumen */
+  audio::-webkit-media-controls-volume-slider {
+    accent-color: #f5e642;
+  }
+
+</style>
+
+</head>
+<body>
+  <h1>Nuestro Calendario de Adviento</h1>
+  <p>Del 1 al 12 — Cada día una sorpresa ✨💜💛</p>
+
+  <div class="calendar" id="calendar"></div>
+
+  <script>
+    const today = new Date();
+    const currentDay = today.getDate();
+
+    const questions = {
+      1: { q: "", a: "" },
+      2: { q: "", a: "" },
+      3: { q: "", a: "" },
+      4: { q: "", a: "" },
+      5: { q: "", a: "" },
+      6: { q: "", a: "" },
+      7: { q: "", a: "" },
+      8: { q: "", a: "" },
+      9: { q: "", a: "" },
+      10: { q: "", a: "" },
+      11: { q: "", a: "" },
+      12: { q: "", a: "" },
+    };
+
+    const surprises = {
+      1: "Mi reina no te haces una idea de lo especial que eres para mi, cada vez necesito más tenerte cerca. Eres la mujer de mi vida.", // Aquí puedes poner texto, <img src='url'> o <audio controls src='url'></audio>
+      2: `
+            <h2>🎶 Esta canción representa mucho lo que siento por ti mi vida 🖤</h2>
+            <audio controls src="https://www.dropbox.com/scl/fi/kx4jksul4ewryd17qoa7a/Stephen-Sanchez-Until-I-Found-You-Lyrics.mp3?rlkey=vb8qsvxgv8264xgvlxhyf4n7r&st=5a0jd3r8&dl=1"></audio>
+          `,
+      3: `
+            <h2>Me encanto irme de viajecito en San Valentín, te amo mi amorcito 🥰🥰🥰🥰</h2>
+            <img src="https://www.dropbox.com/scl/fi/hg6cpr0qt3ax7e0h08krg/WhatsApp-Image-2025-11-26-at-23.13.45.jpeg?rlkey=nj5z7d4j6y3qfab3izg0kwnq2&st=bel76bq4&dl=1" alt="Sorpresa" style="max-width:100%; border-radius:12px; margin-top:10px;">
+            `,
+      
+      4: "",
+      5: "",
+      6: "",
+      7: "",
+      8: `
+            <h2>🥰🥰🥰🥰 Que ganas de ir a otro concierto con mi reina 🥰🥰🥰🥰🥰</h2>
+            <img src="https://www.dropbox.com/scl/fi/zrvz253bfgznq0os2jxpt/WhatsApp-Image-2025-11-26-at-22.58.43.jpeg?rlkey=r7zkctevdmuysiormfjhl3os2&st=gonur75v&dl=1" alt="Sorpresa" style="max-width:100%; border-radius:12px; margin-top:10px;">
+            <audio controls src="https://www.dropbox.com/scl/fi/wy737hapbvk67tgyc6hwk/Quevedo-KASSANDRA-LetraLyrics-BUENAS-NOCHES.mp3?rlkey=8efvhlcxqez8ulct7qvq27b1x&st=mw76x4eh&dl=1"></audio>
+            `,
+      9: "",
+      10: "",
+      11: "",
+      12: "",
+    };
+
+    function normalize(text) {
+      return text.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase();
+    }
+
+    function askQuestion(day, callback) {
+      const modal = document.createElement("div");
+      modal.style.position = "fixed";
+      modal.style.top = 0;
+      modal.style.left = 0;
+      modal.style.width = "100%";
+      modal.style.height = "100%";
+      modal.style.background = "rgba(0,0,0,0.7)";
+      modal.style.display = "flex";
+      modal.style.alignItems = "center";
+      modal.style.justifyContent = "center";
+      modal.style.zIndex = 1000;
+
+      const box = document.createElement("div");
+      box.style.background = "#fff";
+      box.style.padding = "25px";
+      box.style.borderRadius = "15px";
+      box.style.width = "90%";
+      box.style.maxWidth = "350px";
+      box.style.textAlign = "center";
+      box.style.color = "#000";
+      box.style.animation = "pop 0.3s ease";
+
+      const style = document.createElement('style');
+      style.textContent = `@keyframes pop {0%{transform:scale(0.5);opacity:0;}100%{transform:scale(1);opacity:1;}}`;
+      document.head.appendChild(style);
+
+      const title = document.createElement("h3");
+      title.textContent = "Pregunta del día " + day;
+
+      const question = document.createElement("p");
+      question.textContent = questions[day].q || "";
+
+      const input = document.createElement("input");
+      input.type = "text";
+      input.style.width = "100%";
+      input.style.padding = "8px";
+      input.style.marginTop = "10px";
+
+      const btn = document.createElement("button");
+      btn.textContent = "Responder";
+      btn.style.marginTop = "15px";
+      btn.style.padding = "10px 20px";
+      btn.style.background = "#b37bff";
+      btn.style.border = "none";
+      btn.style.color = "white";
+      btn.style.borderRadius = "10px";
+      btn.style.cursor = "pointer";
+
+      btn.onclick = () => {
+        const user = normalize(input.value);
+        const ans = normalize(questions[day].a || "");
+        if (!ans || user === ans) {
+          document.body.removeChild(modal);
+          callback(true);
+        } else {
+          alert("Respuesta incorrecta ✖️");
+        }
+      };
+
+      box.appendChild(title);
+      box.appendChild(question);
+      box.appendChild(input);
+      box.appendChild(btn);
+      modal.appendChild(box);
+      document.body.appendChild(modal);
+    }
+
+    const calendar = document.getElementById("calendar");
+
+    const icons = {
+      1: "🎁",
+      2: "✨",
+      3: "💜",
+      4: "💛",
+      5: "🎄",
+      6: "❤️",
+      7: "🎶",
+      8: "🌟",
+      9: "💌",
+      10: "💖",
+      11: "🎉",
+      12: "🔥"
+    };
+
+
+    for (let i = 1; i <= 12; i++) {
+      const dayBox = document.createElement("div");
+      dayBox.classList.add("day");
+      dayBox.innerHTML = `<span class="icon">${icons[i]}</span>${i}`;
+
+
+      dayBox.addEventListener("click", function openDay() {
+        /*
+        if (i !== currentDay) {
+          alert("Solo puedes abrir la casilla del día de hoy ✨");
+          return;
+        }
+        */
+        askQuestion(i, (ok) => {
+          if (ok) {
+            dayBox.classList.add("revealed");
+            dayBox.innerHTML = surprises[i] || "(Contenido del día)";
+
+            /* Evitar que vuelva a saltar la pregunta */
+            dayBox.removeEventListener("click", openDay);
+
+            /* Hacer que abra el modal en grande */
+            dayBox.onclick = () => {
+              openModal(dayBox.innerHTML);
+            };
+            dayBox.style.transition = "all 0.5s ease";
+          }
+        });
+      });
+
+      calendar.appendChild(dayBox);
+    }
+
+    function openModal(htmlContent) {
+      const overlay = document.createElement("div");
+      overlay.className = "modal-overlay";
+
+      const box = document.createElement("div");
+      box.className = "modal-content";
+      box.innerHTML = htmlContent;
+
+      const closeBtn = document.createElement("button");
+      closeBtn.className = "modal-close";
+      closeBtn.textContent = "Cerrar";
+      closeBtn.onclick = () => document.body.removeChild(overlay);
+
+      box.appendChild(closeBtn);
+      overlay.appendChild(box);
+      document.body.appendChild(overlay);
+    }
+
+
+  </script>
+</body>
+</html>
+
+
