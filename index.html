@@ -90,9 +90,10 @@
     margin-top: 10px;
   }
 
-  audio {
-    margin-top: 10px;
+  .revealed audio {
+    margin-top: 12px;
     width: 100%;
+    flex-shrink: 0;
   }
    /* === MODAL BONITO === */
 
@@ -145,12 +146,15 @@
     font-weight: bold;
   }
 
-  .modal-content img,
-  .modal-content video,
+  .modal-content img {
+    max-width: 100%;
+    width: 100%;
+    height: auto;
+  }
   .modal-content audio {
-    max-width: 100% !important;        /* se ajustan al ancho */
-    width: 100% !important;
-    height: auto !important;
+    width: 100%;
+    margin-top: 10px;
+    display: block;
   }
 
     /* === TABLET (pantallas medianas) — 3 columnas === */
@@ -323,7 +327,7 @@
       1: `<h3>🖤 Mi reina no te haces una idea de lo especial que eres para mi, cada vez necesito más tenerte cerca. Eres la mujer de mi vida. 😍😍😍</h3>`, // Aquí puedes poner texto, <img src='url'> o <audio controls src='url'></audio>
       2: `
             <h2>🎶 Esta canción representa mucho lo que siento por ti mi vida 🖤</h2>
-            <audio controls src="https://github.com/juanroman1313/calendario-adviento/raw/refs/heads/main/audio/Stephen%20Sanchez%20-%20Until%20I%20Found%20You%20(Lyrics).mp3"></audio>
+            <audio controls preload="none" src="audio/Until-i-found-you.mp3"></audio>
           `,
       3: `
             <h2>Me encanto irme de viajecito en San Valentín, te amo mi amorcito 🥰🥰🥰🥰</h2>
@@ -342,12 +346,12 @@
             `,
       7: `
             <h2>👑🎶 Tu canción, MI REINA 🎶👑</h2>
-            <audio controls src="https://github.com/juanroman1313/calendario-adviento/raw/refs/heads/main/audio/Mora,%20Saiko%20-%20REINA%20(Visualizer)%20%20ESTRELLA.mp3"></audio>
+            <audio controls preload="none" src="audio/Reina.mp3"></audio>
           `,
       8: `
             <h2>🥰🥰🥰🥰 Que ganas de ir a otro concierto con mi reina 🥰🥰🥰🥰🥰</h2>
             <img src="https://www.dropbox.com/scl/fi/zrvz253bfgznq0os2jxpt/WhatsApp-Image-2025-11-26-at-22.58.43.jpeg?rlkey=r7zkctevdmuysiormfjhl3os2&st=gonur75v&dl=1" alt="Sorpresa" style="max-width:100%; border-radius:12px; margin-top:10px;">
-            <audio controls src="https://github.com/juanroman1313/calendario-adviento/raw/refs/heads/main/audio/Quevedo%20-%20KASSANDRA%20(LetraLyrics)%20%20BUENAS%20NOCHES.mp3"></audio>
+            <audio controls preload="none" src="audio/Quevedo-Kassandra.mp3"></audio>
             `,
       9: "",
       10: "",
@@ -452,12 +456,12 @@
 
 
       dayBox.addEventListener("click", function openDay() {
-        
+        /*
         if (i !== currentDay) {
           alert("Solo puedes abrir la casilla del día de hoy ✨");
           return;
         }
-        
+        */
         askQuestion(i, (ok) => {
           if (ok) {
             dayBox.classList.add("revealed");
